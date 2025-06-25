@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: yoyo build
+name: build and release
 on:
   push:
     tags:
@@ -33,19 +33,19 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: yy-windows.zip
+          filename: catmovie-windows.zip
           directory: build/windows/x64/runner/Release
       - name: Upload assets
         uses: actions/upload-artifact@v4
         with:
           name: windows
-          path: build/windows/x64/runner/Release/yy-windows.zip
+          path: build/windows/x64/runner/Release/catmovie-windows.zip
 
-  build-linux-x86_64:
+  build-linux:
     runs-on: ubuntu-22.04
 
     env:
-      TARBALL_NAME: yy-linux-x86_64.tar.gz
+      TARBALL_NAME: catmovie-linux-x86_64.tar.gz
 
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
           name: x86_64_linux
           path: build/linux/x64/release/${{ env.TARBALL_NAME }}
 
-  build-macOS-and-release:
+  build-and-release:
     runs-on: macos-latest
     steps:
       - uses: maxim-lobanov/setup-xcode@v1
@@ -105,13 +105,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build android apk(muitple archs)
+        # flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi
         run: |
           bash script/fetch_git_info.sh
           flutter pub get
           flutter pub run build_runner build
           flutter pub deps
           flutter build apk --release -v
-        # flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi
+          cp build/app/outputs/flutter-apk/app-release.apk catmovie.apk
 
       - name: Build iOS ipa
         run: |
@@ -121,31 +122,31 @@ jobs:
           cd Payload
           ln -s ../Runner.app
           cd ..
-          zip -r yoyo.ipa Payload
+          zip -r catmovie.ipa Payload
 
       - name: Build macOS
         run: |
           flutter config --enable-macos-desktop
           flutter build macos --release -v
           cd build/macos/Build/Products/Release
-          zip -r yoyo.mac.zip yoyo.app/*
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: x86_64_linux
+          zip -r catmovie-mac.zip 小猫影视.app/*
 
       - uses: actions/download-artifact@v4
         with:
           name: windows
+      - uses: actions/download-artifact@v4
+        with:
+          name: x86_64_linux
 
       - uses: softprops/action-gh-release@v2
         with:
           body_path: release-notes.txt
+          prerelease: false
           files: |
-            build/ios/iphoneos/yoyo.ipa
-            build/app/outputs/flutter-apk/*.apk
-            build/macos/Build/Products/Release/yoyo.mac.zip
-            yy-linux-x86_64.tar.gz
-            yy-windows.zip
+            catmovie-windows.zip
+            catmovie-linux-x86_64.tar.gz
+            catmovie.apk
+            build/ios/iphoneos/catmovie.ipa
+            build/macos/Build/Products/Release/catmovie-mac.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
