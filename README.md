@@ -110,20 +110,3 @@ x86_64架构: [![](https://img.shields.io/badge/-点我下载-blue?logo=github)]
 `iOS` 推荐使用内置浏览器来播放视频
 
 <img width="240" src="https://files.catbox.moe/fzqpps.png" />
-
-### copyright
-
-图片素材来自:
-
-- [花开荼靡心事未了](https://www.iconfont.cn/user/detail?spm=a313x.7781069.0.d214f71f6&uid=184365&nid=uWAFTqbAJ8hx)
-
-- [Rahul](https://www.iconfont.cn/user/detail?uid=472001&nid=WYOADQZTMZeR)
-
-- [菲崎爷爷](https://www.iconfont.cn/illustrations/detail?spm=a313x.7781069.1998910419.d9df05512&cid=36701)
-
-- [chuncui199188](https://www.iconfont.cn/illustrations/detail?spm=a313x.7781069.1998910419.d9df05512&cid=24522)
-
-- [九月红前来求药](https://www.iconfont.cn/user/detail?spm=a313x.7781069.0.d214f71f6&uid=4919826&nid=5Z6XDuRro8Q4)
-
-
-**仅供学习参考**
