@@ -235,6 +235,13 @@ class _MirrorTableViewState extends State<MirrorTableView> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         previousPageTitle: _title,
+        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
+        border: Border(
+          bottom: BorderSide(
+            color: CupertinoColors.systemGrey.withOpacity(.24),
+            width: 1,
+          ),
+        ),
         trailing: CustomPopupMenu(
           menuBuilder: () => PopMenuBox(
             items: menuItems,
