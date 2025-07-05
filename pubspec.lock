@@ -1433,9 +1433,11 @@ packages:
   webplayer_embedded:
     dependency: "direct main"
     description:
-      path: "/Users/shiwanbaqianmeng/code/github/webplayer_embedded"
-      relative: false
-    source: path
+      path: "."
+      ref: "2aa1e90262d052592074a45b9180ba5a61f90329"
+      resolved-ref: "2aa1e90262d052592074a45b9180ba5a61f90329"
+      url: "https://github.com/d1y/webplayer_embedded"
+    source: git
     version: "0.0.1"
   webview_flutter:
     dependency: "direct main"
