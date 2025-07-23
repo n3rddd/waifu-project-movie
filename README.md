@@ -15,7 +15,7 @@
 官方源参考: https://github.com/waifu-project/movie/issues/45
 > 也支持自定义源, 可自行添加源, 参考: [源制作.md](./docs/create_source.md)
 
-<img src="https://github.com/user-attachments/assets/cc99ceca-bc11-4fcd-84d6-16b07d155c5a" width="420" />
+<img width="420" src="https://github.com/user-attachments/assets/b895c8fd-43c7-479c-b21b-dfa088678d53" />
 
 ### 安装
 
