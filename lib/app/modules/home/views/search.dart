@@ -209,6 +209,7 @@ class _SearchV2State extends State<SearchV2> {
                         child: CupertinoTextField(
                           controller: textEditingController,
                           onSubmitted: handleSearch,
+                          textInputAction: TextInputAction.search,
                           decoration: BoxDecoration(
                             color: CupertinoDynamicColor.withBrightness(
                               color: "#f0f0f0".$color,
