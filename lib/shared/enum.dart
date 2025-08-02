@@ -10,6 +10,30 @@ enum SystemThemeMode {
   dark,
 }
 
+enum VideoKernel {
+  webview,
+  mediaKit,
+  /// macos 专属
+  iina,
+}
+
+extension  VideoKernelExtension on VideoKernel {
+  bool get isWebview => this == VideoKernel.webview;
+  bool get isMediaKit => this == VideoKernel.mediaKit;
+  bool get isIina => this == VideoKernel.iina;
+
+  String get name {
+    switch (this) {
+      case VideoKernel.webview:
+        return "Webview";
+      case VideoKernel.mediaKit:
+        return "MediaKit";
+      case VideoKernel.iina:
+        return "IINA";
+    }
+  }
+}
+
 extension SystemThemeModeExtension on SystemThemeMode {
   bool get isSytem => this == SystemThemeMode.system;
   bool get isLight => this == SystemThemeMode.light;
@@ -28,14 +52,21 @@ extension SystemThemeModeExtension on SystemThemeMode {
 }
 
 enum SettingsAllKey {
+  /// 主题
   themeMode,
-  iosCanBeUseSystemBrowser,
-  macosPlayUseIINA,
+  /// 播放器内核
+  videoKernel,
+  /// 是否开启成人模式
   isNsfw,
+  /// 当前源(索引)
   mirrorIndex,
+  /// 源链接(textarea)
   mirrorTextarea,
+  /// 是否已经提示过免责声明
   showPlayTips,
+  /// webview 启动的服务类型
   webviewPlayType,
+  /// 首次启动
   onBoardingShowed,
 }
 

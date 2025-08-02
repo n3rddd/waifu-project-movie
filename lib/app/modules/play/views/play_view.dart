@@ -1,7 +1,10 @@
 import 'dart:ui';
 
+import 'package:catmovie/app/extension.dart';
+import 'package:catmovie/app/modules/play/controllers/play_controller.dart';
 import 'package:catmovie/app/modules/play/views/cast_screen.dart';
 import 'package:catmovie/app/widget/zoom.dart';
+import 'package:catmovie/shared/enum.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,13 +16,13 @@ import 'package:catmovie/app/modules/home/views/parse_vip_manage.dart';
 import 'package:catmovie/app/widget/helper.dart';
 import 'package:catmovie/app/widget/window_appbar.dart';
 import 'package:catmovie/widget/simple_html/flutter_html.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:simple/x.dart';
 import 'package:smooth_list_view/smooth_list_view.dart';
 import 'package:xi/xi.dart';
-
-import '../controllers/play_controller.dart';
+import 'package:media_kit/media_kit.dart';
 
 class PlayState {
   const PlayState(this.tabIndex, this.index);
@@ -39,6 +42,11 @@ class _PlayViewState extends State<PlayView> {
   final HomeController home = Get.find<HomeController>();
   final FocusNode focusNode = FocusNode();
   final ScrollController scrollController = ScrollController();
+
+  late final Player player = Player();
+  late final controller = VideoController(player);
+
+  VideoKernel videoKernel= VideoKernel.webview;
 
   bool get canBeShowParseVipButton {
     return home.parseVipList.isNotEmpty;
@@ -71,14 +79,31 @@ class _PlayViewState extends State<PlayView> {
   @override
   void initState() {
     focusNode.requestFocus();
+    videoKernel = getSettingAsKeyIdent<VideoKernel>(SettingsAllKey.videoKernel);
+    if (mounted) setState(() {});
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    player.dispose().catchError((error) {
+      debugPrint("player dispose error: $error");
+    });
+    super.dispose();
   }
 
   Future<void> handlePlay(int tabIndex, int index) async {
     var realPlaylist = playlist[tabIndex].datas;
     var curr = playlist[tabIndex].datas[index];
-    if (!await play.handleTapPlayerButtom(curr, realPlaylist, tabIndex)) return;
-    Future.delayed(const Duration(milliseconds: 420), () {
+    var isOk = await play.handleTapPlayerButtom(
+      curr,
+      realPlaylist,
+      tabIndex,
+      videoKernel,
+      player,
+    );
+    if (!isOk) return;
+    Future.delayed(const Duration(milliseconds: 240), () {
       play.updatePlayState(tabIndex, index);
     });
   }
@@ -186,66 +211,75 @@ class _PlayViewState extends State<PlayView> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          height: screenHeight * coverHeightScale,
-                          decoration: const BoxDecoration(
-                            color: Color.fromRGBO(246, 246, 246, 1),
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned.fill(
-                                child: Image.network(
-                                  play.movieItem.smallCoverImage,
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (_, __, ___) {
-                                    return Image.asset(
-                                      K_DEFAULT_IMAGE,
-                                      fit: BoxFit.cover,
-                                    );
-                                  },
-                                ),
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Expanded(child: SizedBox.shrink()),
-                                  Container(
-                                    width: double.infinity,
-                                    clipBehavior: Clip.antiAlias,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black12,
-                                    ),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(
-                                        sigmaX: 24,
-                                        sigmaY: 24,
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                          horizontal: 24,
-                                        ),
-                                        child: Text(
-                                          play.movieItem.title,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleLarge
-                                              ?.copyWith(
-                                                  color: context.isDarkMode
-                                                      ? Colors.white
-                                                      : Colors.black),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 4,
-                                        ),
-                                      ),
-                                    ),
+                        if (videoKernel.isMediaKit)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 420,
+                            child: Video(
+                              controller: controller,
+                            ),
+                          )
+                        else
+                          Container(
+                            width: double.infinity,
+                            height: screenHeight * coverHeightScale,
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(246, 246, 246, 1),
+                            ),
+                            child: Stack(
+                              children: [
+                                Positioned.fill(
+                                  child: Image.network(
+                                    play.movieItem.smallCoverImage,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) {
+                                      return Image.asset(
+                                        K_DEFAULT_IMAGE,
+                                        fit: BoxFit.cover,
+                                      );
+                                    },
                                   ),
-                                ],
-                              ),
-                            ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Expanded(child: SizedBox.shrink()),
+                                    Container(
+                                      width: double.infinity,
+                                      clipBehavior: Clip.antiAlias,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black12,
+                                      ),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 24,
+                                          sigmaY: 24,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 12,
+                                            horizontal: 24,
+                                          ),
+                                          child: Text(
+                                            play.movieItem.title,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleLarge
+                                                ?.copyWith(
+                                                    color: context.isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black),
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 4,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -497,7 +531,9 @@ class _PlayViewState extends State<PlayView> {
                                                 }),
                                                 onPressed: () {
                                                   handlePlay(
-                                                      play.tabIndex, index);
+                                                    play.tabIndex,
+                                                    index,
+                                                  );
                                                 },
                                                 onLongPress: () {
                                                   showMenu();
