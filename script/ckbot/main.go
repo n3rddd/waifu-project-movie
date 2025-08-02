@@ -118,7 +118,7 @@ func (s *Set[T]) Has(value T) bool {
 var domains = NewSet[string]()
 
 func getDomainWithURL(urlStr string) (string, error) {
-	u, err := url.Parse(urlStr)
+	u, err := url.Parse(strings.ToLower(urlStr))
 	if err != nil {
 		return "", fmt.Errorf("解析 URL 失败: %w", err)
 	}
