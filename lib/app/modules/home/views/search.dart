@@ -509,6 +509,8 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
                     child: Text(
                       item.name,
                       textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: TextStyle(
                         color: textColor,
                         fontWeight: FontWeight.bold,
@@ -541,11 +543,18 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
                             if (item.videos.isEmpty) {
                               String id = item.id;
                               Get.dialog(
-                                const Center(
-                                  child: CupertinoActivityIndicator(),
+                                Center(
+                                  child: Image.asset(
+                                    "assets/loading.gif",
+                                    width: 120,
+                                    height: 120,
+                                  ),
                                 ),
                               );
-                              data = await home.currentMirrorItem.getDetail(id);
+                              var cx = home.mirrorList.firstWhere((item) {
+                                return item.meta == currSource;
+                              });
+                              data = await cx.getDetail(id);
                               Get.back();
                             }
                             Get.toNamed(
