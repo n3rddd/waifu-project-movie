@@ -112,6 +112,7 @@ class _SettingsViewState extends State<SettingsView>
       _autoDarkMode = themeMode.isSytem;
       _videoKernel =
           getSettingAsKeyIdent<VideoKernel>(SettingsAllKey.videoKernel);
+      _mirrorLength = SpiderManage.data.length;
     });
     loadSourceHelp();
     addMirrorMangerTextareaLister();
@@ -169,6 +170,23 @@ class _SettingsViewState extends State<SettingsView>
     setState(() {
       _nShowNSFW = newVal;
     });
+  }
+
+  int _mirrorLength = 0;
+
+  String get mirrorLengthWithText {
+    if (_mirrorLength == 0) {
+      return "暂无";
+    }
+    return _mirrorLength.toString();
+  }
+
+  // NOTE(d1y): 这里的 home.parseVipList 会动态更新吗?
+  String get parseVipListWithText {
+    if (home.parseVipList.isEmpty) {
+      return "暂无";
+    }
+    return home.parseVipList.length.toString();
   }
 
   final TextEditingController _editingController = TextEditingController();
@@ -242,6 +260,8 @@ class _SettingsViewState extends State<SettingsView>
         SpiderManage.mergeSpider(realSources);
         var showMessage = "已同步成功(${realSources.length}个源)!";
         EasyLoading.showSuccess(showMessage);
+        _mirrorLength = realSources.length;
+        if (mounted) setState(() {});
         break;
       default:
     }
@@ -333,7 +353,7 @@ class _SettingsViewState extends State<SettingsView>
         height: Get.height * .2,
         width: context.widthTransformer(dividedBy: 1),
         child: Card(
-          color: const Color.fromRGBO(0, 0, 0, .02),
+          color: const Color.fromRGBO(0, 0, 0, 1),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
@@ -422,8 +442,7 @@ class _SettingsViewState extends State<SettingsView>
                   EasyLoading.dismiss();
                   Get.to(() => const ParseVipManagePageView());
                 },
-                // TODO(d1y): impl this
-                // value: Text("1个线路"),
+                value: SimpleTag(text: parseVipListWithText),
               ),
               SettingsTile.navigation(
                 leading: Icon(Icons.video_library),
@@ -432,8 +451,7 @@ class _SettingsViewState extends State<SettingsView>
                   EasyLoading.dismiss();
                   handleSourceHelp();
                 },
-                // TODO(d1y): impl this
-                // value: Text("55个源"),
+                value: SimpleTag(text: mirrorLengthWithText),
               ),
               SettingsTile(
                 leading: Icon(CupertinoIcons.macwindow),
@@ -552,6 +570,33 @@ class Copyright extends AbstractSettingsTile {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+class SimpleTag extends StatelessWidget {
+  const SimpleTag({super.key, required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: (context.isDarkMode ? Colors.white : Colors.black)
+              .withValues(alpha: .42),
+        ),
+      ),
+      padding: EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 3,
+      ),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 14),
       ),
     );
   }
