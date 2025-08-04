@@ -15,7 +15,15 @@
 官方源参考: https://github.com/waifu-project/movie/issues/45
 > 也支持自定义源, 可自行添加源, 参考: [源制作.md](./docs/create_source.md)
 
-<img width="420" src="https://github.com/user-attachments/assets/b895c8fd-43c7-479c-b21b-dfa088678d53" />
+<details>
+<summary>查看截图</summary>
+
+![首页](https://s2.loli.net/2025/08/04/1qJ72QC9ioxRjkZ.jpg)
+![搜索](https://s2.loli.net/2025/08/04/VNZtikObdxhnRLf.jpg)
+![TV](https://s2.loli.net/2025/08/04/XUZ18fmzEwiPoR3.jpg)
+![播放](https://s2.loli.net/2025/08/04/THIq3Ym5nhupPa6.jpg)
+
+</details>
 
 ### 安装
 
