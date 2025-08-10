@@ -247,43 +247,66 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                constraints: BoxConstraints(maxWidth: 240),
-                child: Zoom(
-                  onTap: () {
-                    Get.back();
-                  },
-                  scaleRatio: .99,
-                  child: videoKernel.isMediaKit
-                      ? Container(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          child: Row(
-                            spacing: 6,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Icon(CupertinoIcons.back, size: 28),
-                              Expanded(
-                                child: Text(
-                                  play.movieItem.title,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                          color: context.isDarkMode
-                                              ? Colors.white
-                                              : Colors.black),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+              Expanded(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: Container(
+                        child: videoKernel.isMediaKit
+                            ? Container(
+                                padding: EdgeInsets.symmetric(vertical: 12)
+                                    .copyWith(right: 24),
+                                child: Row(
+                                  spacing: 6,
+                                  mainAxisSize: MainAxisSize.max,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(CupertinoIcons.back, size: 28),
+                                    Expanded(
+                                      child: Text(
+                                        play.movieItem.title,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                                color: context.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      : CupertinoNavigationBarBackButton(
-                          onPressed: () {
-                            // NOOP
-                          },
+                              )
+                            : Row(
+                              children: [
+                                Zoom(
+                                  child: CupertinoNavigationBarBackButton(
+                                      onPressed: () {
+                                        // NOOP
+                                      },
+                                    ),
+                                ),
+                              ],
+                            ),
+                      ),
+                    ),
+                    Positioned(
+                      left: 0,
+                      top: 0,
+                      bottom: 0,
+                      width: 120,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: Get.back,
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: SizedBox.expand(),
                         ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (canBeShowParseVipButton)
