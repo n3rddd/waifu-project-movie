@@ -333,18 +333,17 @@ class _IndexHomeViewState extends State<IndexHomeView>
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 24.0,
                                 ),
-                                // FIXME: use real primary color
-                                // >> theme_data _colorSchemeLightM3->primary
                                 color: isCurr
-                                    ? Color(0xFF6750A4)
-                                    : (Get.isDarkMode ? '#1c1c1e' : "#f0f0f0")
+                                    ? (context.isDarkMode ? "#f1f1f1" : "#0f0f0f")
+                                        .$color
+                                    : (context.isDarkMode ? '#272727' : "#e2e8f0")
                                         .$color,
                                 child: Text(
                                   curr.name,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: isCurr
-                                        ? Colors.white
+                                        ? (context.isDarkMode ? Colors.black : Colors.white)
                                         : Theme.of(context)
                                             .textTheme
                                             .labelLarge!
