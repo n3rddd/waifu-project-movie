@@ -102,7 +102,7 @@ class HomeController extends GetxController
     return parseVipList[currentParseVipIndex];
   }
 
-  final mirrorCategoryPool = MirrorCategoryPool();
+  final cacheCategory = CacheWithCategory();
 
   String get currentMirrorItemId {
     if (mirrorListIsEmpty) return "";
@@ -110,18 +110,19 @@ class HomeController extends GetxController
   }
 
   List<SourceSpiderQueryCategory> get currentCategoryer {
-    var data = mirrorCategoryPool.data(currentMirrorItemId);
+    var data = cacheCategory.data(currentMirrorItemId);
     return data;
   }
 
   bool get currentHasCategoryer {
-    return mirrorCategoryPool.has(currentMirrorItemId);
+    return cacheCategory.has(currentMirrorItemId);
   }
 
   SourceSpiderQueryCategory? currentCategoryerNow;
 
   void setCurrentCategoryerNow(SourceSpiderQueryCategory category) {
     currentCategoryerNow = category;
+    cacheCategory.setLastUsed(currentMirrorItem.meta.id, category);
     updateHomeData(isFirst: true);
     update();
   }
@@ -175,7 +176,8 @@ class HomeController extends GetxController
   void easyCleanCacheHook() {
     _isNsfw = false;
     _cacheMirrorIndex = -1;
-    mirrorCategoryPool.clean();
+    cacheCategory.clean();
+    cacheCategory.cleanupLastUsed();
     if (_parseVipList.isNotEmpty) {
       _parseVipList = [];
       update();
@@ -362,7 +364,7 @@ class HomeController extends GetxController
     protocolHandler.addListener(this);
     updateWindowLastSize();
     WidgetsBinding.instance.addObserver(this);
-    MirrorCategoryPool().init();
+    cacheCategory.init();
     updateNsfwSetting();
     updateHomeData(isFirst: true);
     initCacheMirrorTableScrollControllerOffset();
@@ -387,18 +389,18 @@ class HomeController extends GetxController
       if (mirrorListIsEmpty) return null;
       var category = await currentMirrorItem.getCategory();
 
-      /// NOTE(d1y): 为空也是一种错误的表现
+      // NOTE(d1y): 为空也是一种错误的表现
       if (category.isEmpty) {
-        mirrorCategoryPool.fetchCountPP(currentMirrorItemId);
+        cacheCategory.fetchCountPP(currentMirrorItemId);
         return null;
       }
-      mirrorCategoryPool.put(currentMirrorItemId, category);
+      cacheCategory.put(currentMirrorItemId, category);
       currentCategoryerNow = category.first;
       update();
       return category.first;
     } catch (e) {
       if (currentMirrorItemId.isNotEmpty) {
-        mirrorCategoryPool.fetchCountPP(currentMirrorItemId);
+        cacheCategory.fetchCountPP(currentMirrorItemId);
       }
       debugPrint(e.toString());
       return null;
@@ -422,7 +424,7 @@ class HomeController extends GetxController
 
       // NOTE(d1y): 不存在分类并且请求次数没有超过阈值
       var needFetch = !currentHasCategoryer &&
-          !mirrorCategoryPool.fetchCountAlreadyMax(currentMirrorItemId);
+          !cacheCategory.fetchCountAlreadyMax(currentMirrorItemId);
 
       if (needFetch) {
         try {
@@ -434,11 +436,16 @@ class HomeController extends GetxController
           dispose();
         }
       } else {
+        var lastUsed = cacheCategory.getLastUsed(currentMirrorItem.meta.id);
+        if (lastUsed != null) {
+          currentCategoryerNow = lastUsed;
+          update();
+        }
         if (currentCategoryerNow == null) {
           currentCategoryerNow = currentCategoryer.first;
           update();
-          onceCategory = currentCategoryerNow!.id;
         }
+        onceCategory = currentCategoryerNow!.id;
       }
     }
 

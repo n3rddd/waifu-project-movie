@@ -8,14 +8,26 @@ import 'package:xi/xi.dart';
 /// NOTE(d1y): 获取分类最大尝试次数(3次)
 const kMirrorCategoryTryCountMax = 3;
 
-/// 源分类缓存池
-/// TODO(d1y): 持久化
-class MirrorCategoryPool {
-  MirrorCategoryPool._internal();
-  factory MirrorCategoryPool() => _instance;
-  static final MirrorCategoryPool _instance = MirrorCategoryPool._internal();
+class CacheWithCategory {
+  CacheWithCategory._internal();
+  factory CacheWithCategory() => _instance;
+  static final CacheWithCategory _instance = CacheWithCategory._internal();
 
   Map<String, List<SourceSpiderQueryCategory>> stacks = {};
+
+  final Map<String, SourceSpiderQueryCategory> _lastUsedMap = {};
+
+  void setLastUsed(String key, SourceSpiderQueryCategory category) {
+    _lastUsedMap[key] = category;
+  }
+
+  SourceSpiderQueryCategory? getLastUsed(String key) {
+    return _lastUsedMap[key];
+  }
+
+  void cleanupLastUsed() {
+    _lastUsedMap.clear();
+  }
 
   //===============================
   /// 标记一个最大数📌的请求分类池
@@ -39,7 +51,7 @@ class MirrorCategoryPool {
 
   void init() async {
     _init ??= once(() {
-      debugPrint("init mirror category(OK)");
+      debugPrint("init sources category(OK)");
       var list = categoryAs.where().findAllSync();
       for (var item in list) {
         stacks[item.sid] = item.toRealCategories();
