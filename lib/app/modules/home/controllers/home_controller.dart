@@ -362,11 +362,11 @@ class HomeController extends GetxController
     protocolHandler.addListener(this);
     updateWindowLastSize();
     WidgetsBinding.instance.addObserver(this);
+    MirrorCategoryPool().init();
     updateNsfwSetting();
     updateHomeData(isFirst: true);
     initCacheMirrorTableScrollControllerOffset();
     initMovieParseVipList();
-    MirrorCategoryPool().init();
     super.onInit();
   }
 
