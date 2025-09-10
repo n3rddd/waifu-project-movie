@@ -99,8 +99,8 @@ final Color kActiveColor = Color(0xFF6750A4);
 var scaffoldKey = GlobalKey<ScaffoldState>();
 
 // TODO(d1y): support dynamic set wallpaper
-// https://www.loliapi.com
-final String kWallpaper = "https://www.loliapi.com/acg/";
+// https://www.zichen.zone/archives/acg-api.html
+final String kWallpaper = "https://www.dmoe.cc/random.php";
 
 enum LiveSourceType {
   github,
