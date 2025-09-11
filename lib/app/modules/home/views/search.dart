@@ -603,13 +603,17 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
                           onTap: () async {
                             var data = item;
                             if (item.videos.isEmpty) {
-                              String id = item.id;
-                              var cx = home.mirrorList.firstWhere((item) {
-                                return item.meta == currSource;
-                              });
                               var isNext =
                                   await showLoadingPlaceholderTask(() async {
-                                data = await cx.getDetail(id);
+                                String id = item.id;
+                                var curr =
+                                    home.mirrorList.firstWhereOrNull((cx) {
+                                  return cx.meta == item.getContext();
+                                });
+                                if (curr == null) {
+                                  throw Exception("未找到对应的源");
+                                }
+                                data = await curr.getDetail(id);
                               });
                               if (!isNext) return;
                             }
