@@ -153,6 +153,8 @@ dependencies:
 
   aurora: ^1.0.0
 
+  flutter_keyboard_visibility: ^6.0.0
+
 dependency_overrides:
   media_kit:
     git:

@@ -13,6 +13,7 @@ import 'package:catmovie/utils/boop.dart';
 import 'package:concurrent_queue/concurrent_queue.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
 import 'package:catmovie/app/extension.dart';
 import 'package:isar/isar.dart';
@@ -819,21 +820,24 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
           .withValues(alpha: .88),
       appBar: _buildAppBar(),
       floatingActionButton: _buildActionButton(),
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Builder(builder: (context) {
-          if (showHistory) {
-            return _buildHistory();
-          }
-          if (searchDone && map.isEmpty) {
-            return _buildEmpty();
-          }
-          if (isSearching && map.isEmpty) {
-            return _buildLoading();
-          }
-          return _buildBody();
-        }),
+      body: KeyboardDismissOnTap(
+        dismissOnCapturedTaps: true,
+        child: SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Builder(builder: (context) {
+            if (showHistory) {
+              return _buildHistory();
+            }
+            if (searchDone && map.isEmpty) {
+              return _buildEmpty();
+            }
+            if (isSearching && map.isEmpty) {
+              return _buildLoading();
+            }
+            return _buildBody();
+          }),
+        ),
       ),
     );
   }
