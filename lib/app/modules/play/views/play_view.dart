@@ -290,6 +290,8 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
     );
   }
 
+  double lastScrollOffset = 0;
+
   void showMediaKitPlaylist() {
     var fw = context.mediaQuery.size.width;
     var w = fw * .32;
@@ -302,8 +304,13 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
         list: list,
         sort: playlistSort,
         index: play.playState.index,
+        restoreOffset: lastScrollOffset,
+        onScroll: (offset) {
+          lastScrollOffset = offset;
+        },
         onTap: (index) {
           handlePlay(play.tabIndex, index);
+          Get.back();
         },
         onSortTap: () {
           handleSortPlaylist();
@@ -1064,8 +1071,10 @@ class MediaKitPlaylist extends StatefulWidget {
     required this.list,
     required this.sort,
     required this.index,
+    required this.restoreOffset,
     this.onTap,
     this.onSortTap,
+    this.onScroll,
   });
 
   final double width;
@@ -1074,6 +1083,8 @@ class MediaKitPlaylist extends StatefulWidget {
   final int index;
   final ValueChanged<int>? onTap;
   final VoidCallback? onSortTap;
+  final ValueChanged<double>? onScroll;
+  final double restoreOffset;
 
   @override
   State<MediaKitPlaylist> createState() => _MediaKitPlaylistState();
@@ -1085,12 +1096,30 @@ class _MediaKitPlaylistState extends State<MediaKitPlaylist>
   List<VideoInfo> list = [];
   int index = -1;
 
+  ScrollController controller = ScrollController();
+
   @override
   FutureOr<void> afterFirstLayout(BuildContext context) {
     sort = widget.sort;
     index = widget.index;
     list = widget.list;
     setState(() {});
+    controller.addListener(() {
+      var offset = controller.offset;
+      widget.onScroll?.call(offset);
+    });
+    restoreScrollPosition();
+  }
+
+  void restoreScrollPosition() {
+    var offset = widget.restoreOffset;
+    controller.jumpTo(offset);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 
   void handleSortPlaylist() {
@@ -1178,12 +1207,12 @@ class _MediaKitPlaylistState extends State<MediaKitPlaylist>
                         ),
                       ),
                       Expanded(
-                        child: SmoothListView(
+                        child: ListView(
+                          controller: controller,
                           padding: const EdgeInsets.symmetric(
                             vertical: 12,
                             horizontal: 6,
                           ),
-                          duration: kSmoothListViewDuration,
                           children: list.map((item) {
                             var currIndex = list.indexOf(item);
                             var isCurr = currIndex == index;
