@@ -14,6 +14,8 @@
 
 <!-- <img src="https://s2.loli.net/2025/08/12/dN78kJ1pAwqHYVZ.webp" width="120" /> -->
 
+吹牛逼飞机群: https://t.me/catmovie1145
+
 <details>
 <summary>查看截图 🖼️</summary>
 
