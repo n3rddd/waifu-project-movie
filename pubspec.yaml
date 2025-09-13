@@ -155,6 +155,8 @@ dependencies:
 
   flutter_svg: ^2.2.1
 
+  loading_gifs: ^0.3.0
+
 dependency_overrides:
   media_kit:
     git:

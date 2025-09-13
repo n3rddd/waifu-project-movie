@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:isar/isar.dart';
+import 'package:loading_gifs/loading_gifs.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:catmovie/app/modules/home/views/mirrortable.dart';
 import 'package:catmovie/app/shared/bus.dart';
@@ -38,12 +39,13 @@ enum UpdateSearchHistoryType {
 
 Function showLoading(String msg) {
   EasyLoading.show(
-    status: msg,
-    indicator: Image.asset(
-      "assets/loading.gif",
-      width: 120,
-      height: 120,
-    ),
+    // status: msg,
+    indicator: Image.asset(cupertinoActivityIndicator, scale: 8),
+    // indicator: Image.asset(
+    //   "assets/loading.gif",
+    //   width: 120,
+    //   height: 120,
+    // ),
   );
   return EasyLoading.dismiss;
 }
@@ -53,11 +55,12 @@ Future<bool> showLoadingPlaceholderTask(AsyncCallback task) async {
   try {
     Get.dialog(
       Center(
-        child: Image.asset(
-          "assets/loading.gif",
-          width: 120,
-          height: 120,
-        ),
+        child: Image.asset(cupertinoActivityIndicator, scale: 8),
+        // child: Image.asset(
+        //   "assets/loading.gif",
+        //   width: 120,
+        //   height: 120,
+        // ),
       ),
     );
     await task();
