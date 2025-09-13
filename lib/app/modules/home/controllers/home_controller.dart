@@ -253,17 +253,21 @@ class HomeController extends GetxController
   }
 
   void refreshOnLoading() async {
+    boop.selection();
     try {
       page++;
       update();
       await updateHomeData();
       refreshController.loadComplete();
+      boop.success();
     } catch (e) {
       refreshController.loadFailed();
+      boop.error();
     }
   }
 
   void refreshOnRefresh() async {
+    boop.selection();
     try {
       await updateHomeData(isFirst: true, missIsLoading: true);
       refreshController.refreshCompleted();

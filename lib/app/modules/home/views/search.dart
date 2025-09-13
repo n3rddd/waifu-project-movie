@@ -788,12 +788,15 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
                       });
                       var nextPage = cx.item1 + 1;
                       List<VideoDetail> list = [];
+                      boop.selection();
                       try {
                         list = await axios.getSearch(
                           keyword: keyword,
                           page: nextPage,
                         );
+                        boop.success();
                       } catch (e) {
+                        boop.error();
                         debugPrint(e.toString());
                       }
                       moreBtnLoading = false;

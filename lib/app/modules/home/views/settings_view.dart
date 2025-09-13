@@ -145,6 +145,7 @@ class _SettingsViewState extends State<SettingsView>
     if (!onlyUpdate) {
       showNSFW = flag;
     }
+    boop.selection();
     home.update();
   }
 
@@ -285,6 +286,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   void handleCleanCache() {
+    boop.success();
     home.clearCache();
     home.confirmAlert(
       "已删除缓存, 部分内容重启之后生效!",
@@ -316,6 +318,7 @@ class _SettingsViewState extends State<SettingsView>
         PullDownMenuItem.selectable(
           selected: VideoKernel.iina == _videoKernel,
           onTap: () {
+            boop.success();
             final bool isInstall = checkInstalledIINA();
             if (!isInstall) {
               EasyLoading.showError("未安装IINA, 请先安装!");
@@ -400,6 +403,7 @@ class _SettingsViewState extends State<SettingsView>
   }
 
   void handleCleanCacheBefore(BuildContext ctx) {
+    boop.warning();
     showCupertinoDialog(
       builder: (BuildContext context) => CupertinoAlertDialog(
         title: const Text('提示'),
@@ -413,6 +417,7 @@ class _SettingsViewState extends State<SettingsView>
               ),
             ),
             onPressed: () {
+              boop.selection();
               Get.back();
             },
           ),
@@ -465,9 +470,11 @@ class _SettingsViewState extends State<SettingsView>
                   SettingsTile.switchTile(
                     onToggle: (value) {
                       isDark = value;
+                      boop.success();
                     },
                     onPressed: (cx) {
                       isDark = !isDark;
+                      boop.success();
                     },
                     initialValue: isDark,
                     leading: Icon(Icons.settings_brightness),
@@ -476,9 +483,11 @@ class _SettingsViewState extends State<SettingsView>
                 SettingsTile.switchTile(
                   onToggle: (value) {
                     autoDarkMode = value;
+                    boop.success();
                   },
                   onPressed: (cx) {
                     autoDarkMode = !autoDarkMode;
+                    boop.success();
                   },
                   initialValue: autoDarkMode,
                   leading: Icon(CupertinoIcons.moon_stars_fill),
@@ -489,6 +498,7 @@ class _SettingsViewState extends State<SettingsView>
                   title: Text('解析线路管理'),
                   onPressed: (cx) {
                     EasyLoading.dismiss();
+                    boop.selection();
                     Get.to(() => const ParseVipManagePageView());
                   },
                   value: SimpleTag(text: parseVipListWithText),
@@ -498,6 +508,7 @@ class _SettingsViewState extends State<SettingsView>
                   title: Text('视频源管理'),
                   onPressed: (cx) {
                     EasyLoading.dismiss();
+                    boop.selection();
                     handleSourceHelp();
                   },
                   value: SimpleTag(text: mirrorLengthWithText),
@@ -519,6 +530,7 @@ class _SettingsViewState extends State<SettingsView>
                       btnSize.width,
                       targetHeight,
                     );
+                    boop.selection();
                     showPullDownMenu(
                       context: cx,
                       items: _buildVideoKernel(),
@@ -536,6 +548,7 @@ class _SettingsViewState extends State<SettingsView>
                         padding: EdgeInsets.zero,
                         onPressed: () {
                           EasyLoading.dismiss();
+                          boop.selection();
                           showMenu();
                         },
                         child: Text(_videoKernel.name),
@@ -546,6 +559,7 @@ class _SettingsViewState extends State<SettingsView>
                 SettingsTile.switchTile(
                   onToggle: updateNSFW,
                   onPressed: (cx) {
+                    boop.selection();
                     updateNSFW(!showNSFW);
                   },
                   initialValue: home.isNsfw,
@@ -574,6 +588,7 @@ class _SettingsViewState extends State<SettingsView>
                   leading: Icon(CupertinoIcons.refresh_circled_solid),
                   title: Text('应用更新'),
                   onPressed: (cx) {
+                    boop.selection();
                     showCupertinoModalBottomSheet(
                       context: cx,
                       builder: (_) => AutoUpdate(),
@@ -584,6 +599,7 @@ class _SettingsViewState extends State<SettingsView>
                   leading: Icon(CupertinoIcons.arrow_down_right_square_fill),
                   title: Text('视频源帮助'),
                   onPressed: (cx) {
+                    boop.selection();
                     Get.to(() => const SourceHelpTable());
                   },
                 ),
@@ -593,22 +609,21 @@ class _SettingsViewState extends State<SettingsView>
                   onPressed: handleCleanCacheBefore,
                 ),
                 SettingsTile.navigation(
-                  leading: Builder(
-                    builder: (context) {
-                      return SvgPicture.string(
-                        kGithubIconSvg,
-                        width: 24,
-                        height: 24,
-                                              colorFilter: ColorFilter.mode(
-                            SettingsTheme.of(context).themeData.leadingIconsColor ??
-                                Colors.transparent,
-                            BlendMode.srcIn,
-                          ),
-                      );
-                    }
-                  ),
+                  leading: Builder(builder: (context) {
+                    return SvgPicture.string(
+                      kGithubIconSvg,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        SettingsTheme.of(context).themeData.leadingIconsColor ??
+                            Colors.transparent,
+                        BlendMode.srcIn,
+                      ),
+                    );
+                  }),
                   title: Text('开源协议'),
                   onPressed: (cx) {
+                    boop.selection();
                     showCupertinoModalBottomSheet(
                       context: cx,
                       backgroundColor: Colors.transparent,
@@ -631,6 +646,7 @@ class _SettingsViewState extends State<SettingsView>
                   ),
                   title: Text('小猫交流群'),
                   onPressed: (cx) {
+                    boop.selection();
                     kTelegramGroup.openURL();
                   },
                 ),
