@@ -31,7 +31,7 @@ jobs:
       - name: Build windows
         run: |
           flutter config --enable-windows-desktop
-          flutter build windows --release -v
+          flutter build windows --release
       - name: Add Windows manifest
         run: |
           $dest = "build\windows\x64\runner\Release\"
@@ -76,7 +76,7 @@ jobs:
           # dart run script/add_builtin.dart > lib/builtin/maccms/maccms.dart
           export version=$(echo "${{ github.ref_name }}" | sed 's/^release-v//')
           dart run script/replace_version.dart
-          flutter build linux --release -v
+          flutter build linux --release
       - name: Create tarball
         run: |
           cd build/linux/x64/release/bundle
@@ -123,12 +123,12 @@ jobs:
           # dart run script/add_builtin.dart > lib/builtin/maccms/maccms.dart
           export version=$(echo "${{ github.ref_name }}" | sed 's/^release-v//')
           dart run script/replace_version.dart
-          flutter build apk --release -v
+          flutter build apk --release
           cp build/app/outputs/flutter-apk/app-release.apk catmovie.apk
 
       - name: Build iOS ipa
         run: |
-          flutter build ios --release --no-codesign -v
+          flutter build ios --release --no-codesign
           cd build/ios/iphoneos
           mkdir Payload
           cd Payload
