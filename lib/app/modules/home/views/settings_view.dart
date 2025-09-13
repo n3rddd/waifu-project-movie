@@ -460,6 +460,9 @@ class _SettingsViewState extends State<SettingsView>
                     onToggle: (value) {
                       isDark = value;
                     },
+                    onPressed: (cx) {
+                      isDark = !isDark;
+                    },
                     initialValue: isDark,
                     leading: Icon(Icons.settings_brightness),
                     title: Text('深色'),
@@ -467,6 +470,9 @@ class _SettingsViewState extends State<SettingsView>
                 SettingsTile.switchTile(
                   onToggle: (value) {
                     autoDarkMode = value;
+                  },
+                  onPressed: (cx) {
+                    autoDarkMode = !autoDarkMode;
                   },
                   initialValue: autoDarkMode,
                   leading: Icon(CupertinoIcons.moon_stars_fill),
@@ -494,8 +500,9 @@ class _SettingsViewState extends State<SettingsView>
                   leading: Icon(CupertinoIcons.macwindow),
                   title: Text("播放器内核"),
                   onPressed: (cx) {
-                    final RenderBox renderBox = kVideoKernelBtnKey.currentContext!
-                        .findRenderObject() as RenderBox;
+                    final RenderBox renderBox =
+                        kVideoKernelBtnKey.currentContext!.findRenderObject()
+                            as RenderBox;
                     final Offset btnPosition =
                         renderBox.localToGlobal(Offset.zero);
                     final Size btnSize = renderBox.size;
@@ -532,6 +539,9 @@ class _SettingsViewState extends State<SettingsView>
                 ),
                 SettingsTile.switchTile(
                   onToggle: updateNSFW,
+                  onPressed: (cx) {
+                    updateNSFW(!showNSFW);
+                  },
                   initialValue: home.isNsfw,
                   leading: Builder(builder: (context) {
                     return SvgPicture.string(
