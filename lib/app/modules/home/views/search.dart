@@ -318,7 +318,7 @@ class _SearchV2State extends State<SearchV2> with AfterLayoutMixin {
                                 color: CupertinoDynamicColor.withBrightness(
                                   color: CupertinoColors.inactiveGray,
                                   darkColor: CupertinoColors.white,
-                                ).withValues(alpha: _hasFocus ? .42 : .12),
+                                ).withValues(alpha: _hasFocus ? .72 : .12),
                                 width: 1,
                               ),
                               borderRadius:
