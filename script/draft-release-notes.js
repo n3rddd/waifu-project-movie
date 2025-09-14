@@ -54,10 +54,63 @@ function getTagNote(tag) {
   return note.join("\n") + "\n"
 }
 
+const kRepo = "waifu-project/movie"
+
+const fastGithubDomains = [
+  // https://gh-proxy.com
+  { text: "全球加速", prefix: "https://gh-proxy.com" },
+  { text: "香港加速", prefix: "https://hk.gh-proxy.com" },
+  // https://ghproxy.link
+  { text: "加速3", prefix: "https://ghfast.top" },
+  { text: "原始", prefix: null },
+]
+
+function buildFastLink(fastPrefix, tag, file) {
+  const raw = `https://github.com/${kRepo}/releases/download/${tag}/${file}`
+  if (!fastPrefix) return raw
+  return `${fastPrefix}/${raw}`
+}
+
+function buildRealFastLink(tag, file) {
+  return fastGithubDomains.map((item)=> {
+    const link = buildFastLink(item.prefix, tag, file)
+    return `[${item.text}](${link})`
+  }).join(" \\| ")
+}
+
+function buildReleaseHeader(tag) {
+  const _ = (file)=> buildRealFastLink(tag, file)
+return `
+## 🐱 小猫影视
+
+| 系统     | 文件后缀 | 架构          | 下载链接 |
+|---------|------|-------------|------|
+| macOS   | .zip | 通用(universal)   |  ${_('catmovie-mac.zip')}  |
+| iOS     | .ipa | -           |  ${_('catmovie.ipa')}    |   |   |
+| Android | .apk | 常用(arm64-v8a)   |  ${_('catmovie.apk')}    |   |
+| Android | .apk | 旧手机(armeabi-v7a) |  ${_('catmovie-legacy.apk')}   |
+| Android | .apk | 通用(universal)   |  ${_('catmovie-universal.apk')}    |
+| Windows | .zip | -            |  ${_('catmovie-windows.zip')}    |   |
+| Linux   | .zip | -            | ${_('catmovie-linux-x86_64.tar.gz')}     |
+`
+}
+
+function buildRealNotes(tag, changelog) {
+  const header = buildReleaseHeader(tag)
+  return `
+${header}  
+## 📢 更新日志
+
+${changelog}
+`
+}
+
+const val = buildReleaseHeader('release-v2.5.6')
+console.log(val)
+
 ;(async()=> {
-  const repo = "waifu-project/movie"
   const token = process.env.GITHUB_TOKEN
-  const resp = await fetch(`https://api.github.com/repos/${repo}/tags`, {
+  const resp = await fetch(`https://api.github.com/repos/${kRepo}/tags`, {
     headers: {
       "Authorization": `Bearer ${token}`
     }
@@ -78,5 +131,6 @@ function getTagNote(tag) {
   }
   let releaseNote = getTagNote(now)
   releaseNote += notes.map(item=> `- ${item}`).join("\n")
-  console.log(releaseNote)
+  const note = buildRealNotes(now, releaseNote)
+  console.log(note)
 })()

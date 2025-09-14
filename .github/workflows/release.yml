@@ -115,7 +115,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build android apk
-        # flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi
         run: |
           bash script/fetch_git_info.sh
           flutter pub get
@@ -124,7 +123,11 @@ jobs:
           export version=$(echo "${{ github.ref_name }}" | sed 's/^release-v//')
           dart run script/replace_version.dart
           flutter build apk --release
-          cp build/app/outputs/flutter-apk/app-release.apk catmovie.apk
+          flutter build apk --release --split-per-abi
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk catmovie.apk
+          cp build/app/outputs/flutter-apk/app-release.apk catmovie-universal.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk catmovie-legacy.apk
+          cp build/app/outputs/flutter-apk/app-x86_64-release.apk catmovie-x86_64.apk
 
       - name: Build iOS ipa
         run: |
@@ -158,6 +161,9 @@ jobs:
             catmovie-windows.zip
             catmovie-linux-x86_64.tar.gz
             catmovie.apk
+            catmovie-universal.apk
+            catmovie-legacy.apk
+            catmovie-x86_64.apk
             build/ios/iphoneos/catmovie.ipa
             build/macos/Build/Products/Release/catmovie-mac.zip
         env:

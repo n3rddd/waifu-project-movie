@@ -63,12 +63,11 @@ yay -S xdg-user-dir xdg-utils
 
 #### **Android 🤖**
 
-安卓没有正式测试过, 如果有问题记得提 [issue](https://github.com/waifu-project/movie/issues)
+大部分手机直接使用常用架构包就行了, 通用包兼容多种架构
 
-> [!NOTE]
-> 安卓建议直接将播放器内核切换到 `MediaKit`
-
-[![](https://img.shields.io/badge/-点我下载-blue?logo=github)](https://github.com/waifu-project/movie/releases/latest/download/catmovie.apk)
+- [常用(arm64-v8a)](https://github.com/waifu-project/movie/releases/latest/download/catmovie.apk)
+- [旧手机(armeabi-v7a)](https://github.com/waifu-project/movie/releases/latest/download/catmovie-legacy.apk)
+- [通用(universal)](https://github.com/waifu-project/movie/releases/latest/download/catmovie-universal.apk)
 
 #### **iOS 📱**
 
