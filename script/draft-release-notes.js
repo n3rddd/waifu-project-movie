@@ -105,9 +105,6 @@ ${changelog}
 `
 }
 
-const val = buildReleaseHeader('release-v2.5.6')
-console.log(val)
-
 ;(async()=> {
   const token = process.env.GITHUB_TOKEN
   const resp = await fetch(`https://api.github.com/repos/${kRepo}/tags`, {
