@@ -2,30 +2,30 @@
 
 import type { load as cheerioLoad } from 'cheerio'
 
-type KittyEnvParams =
-  "category" |
-  "page" |
-  "limit" |
-  "movieId" |
-  "keyword" |
-  "iframe"
-
-interface KittyEnv {
-  baseUrl: string,
-  params: Record<KittyEnvParams, any>,
-  get<T>(key: KittyEnvParams, defaultValue?: T): T
-}
-
-interface Kitty {
-  load: typeof cheerioLoad
-}
-
-type KittyReq = (url: string) => Promise<string>
-
 declare global {
   var kitty: Kitty
   var env: KittyEnv
   var req: KittyReq
+
+  type KittyEnvParams =
+    "category" |
+    "page" |
+    "limit" |
+    "movieId" |
+    "keyword" |
+    "iframe"
+
+  interface KittyEnv {
+    baseUrl: string,
+    params: Record<KittyEnvParams, any>,
+    get<T>(key: KittyEnvParams, defaultValue?: T): T
+  }
+
+  interface Kitty {
+    load: typeof cheerioLoad
+  }
+
+  type KittyReq = (url: string) => Promise<string>
 
   interface ICategory {
     text: string
@@ -34,7 +34,8 @@ declare global {
 
   interface IPlaylist {
     text: string
-    id: string
+    url?: string
+    id?: string
   }
 
   interface IMovie {
