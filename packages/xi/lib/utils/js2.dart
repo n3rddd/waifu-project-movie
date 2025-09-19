@@ -24,7 +24,9 @@ class JS2 {
     _runtime.injectMethod('req', (dynamic args) async {
       if (args is List) {
         var url = args[0];
-        var resp = await XHttp.dio.get(url);
+        var resp = await XHttp.dio.get(url, options: Options(
+          responseType: ResponseType.plain,
+        ));
         var body = resp.data.toString();
         return body;
       }
