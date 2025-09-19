@@ -22,15 +22,63 @@ class JS2 {
 
   void _injectMethods() {
     _runtime.injectMethod('req', (dynamic args) async {
-      if (args is List) {
-        var url = args[0];
-        var resp = await XHttp.dio.get(url, options: Options(
+      if (args is List && args.isNotEmpty) {
+        String url = "";
+        Options options = Options(
           responseType: ResponseType.plain,
-        ));
-        var body = resp.data.toString();
-        return body;
+        );
+        var arg1 = args[0];
+        Map argMap = {};
+
+        if (args.length >= 2) {
+          // [ "$url", { "headers", "method" } ]
+          if (arg1 is String) {
+            url = arg1;
+          }
+          var arg2 = args[1];
+          if (arg2 is Map) {
+            argMap = arg2;
+          }
+        } else if (args.length == 1) {
+          // [ "$url" ] | [ { "headers", "method", "url" } ]
+          if (arg1 is String) {
+            url = arg1;
+          } else if (arg1 is Map) {
+            argMap = arg1;
+          }
+        }
+
+        if (url.isEmpty && argMap.isNotEmpty) {
+          url = argMap["url"]?.toString() ?? "";
+        }
+
+        if (url.isEmpty) {
+          return "";
+        }
+
+        options.method = argMap["method"]?.toString() ?? "GET";
+
+        Map<String, String> defaultHeaders = {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
+        };
+
+        if (argMap["headers"] is Map) {
+          var customHeaders = Map<String, String>.from(argMap["headers"]);
+          defaultHeaders.addAll(customHeaders);
+        }
+
+        options.headers = defaultHeaders;
+
+        var resp = await XHttp.dio.request(
+          url,
+          options: options,
+          data: argMap["data"],
+          queryParameters: argMap["params"],
+        );
+        return resp.data?.toString() ?? "";
       }
-      return "NULL";
+      return "";
     });
   }
 

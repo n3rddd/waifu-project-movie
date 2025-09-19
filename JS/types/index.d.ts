@@ -25,7 +25,22 @@ declare global {
     load: typeof cheerioLoad
   }
 
-  type KittyReq = (url: string) => Promise<string>
+  interface KittyRequestOptions {
+    url?: string
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS'
+    headers?: Record<string, string>
+    params?: Record<string, any>
+    data?: any
+  }
+
+  interface KittyReq {
+    // req(url)
+    (url: string): Promise<string>
+    // req(url, options)
+    (url: string, options: Partial<KittyRequestOptions>): Promise<string>
+    // req(options)
+    (options: KittyRequestOptions): Promise<string>
+  }
 
   interface ICategory {
     text: string
