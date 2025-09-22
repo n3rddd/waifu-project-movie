@@ -1003,7 +1003,7 @@ class TVUIState extends State<TVUI>
                             child: Row(
                               spacing: 6,
                               children: [
-                                Text("LIVE"),
+                                Text("LIVE", style: TextStyle(color: Colors.white)),
                                 Container(
                                   width: 12,
                                   height: 12,
