@@ -183,7 +183,8 @@ class UniversalSpider extends ISpiderAdapter {
     });
     if (code.isEmpty) throw kJSEmptyException;
     var result = await js2.evalSync(code, timeout: kEvalTimeout);
-    return parseListWithJSResult(result)[0];
+    var resultWithArray = "[$result]";
+    return parseListWithJSResult(resultWithArray)[0];
   }
 
   @override

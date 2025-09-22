@@ -90,7 +90,7 @@ declare global {
   type HandleConfig = () => Iconfig
   type HandleCategory = () => Promise<ICategory[]>
   type HandleHome = () => Promise<IMovie[]>
-  type HandleDetail = () => Promise<IMovie[]>
+  type HandleDetail = () => Promise<IMovie>
   type HandleSearch = () => Promise<IMovie[]>
   type HandleParseIframe = () => Promise<string[] | string>
 
