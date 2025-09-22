@@ -57,6 +57,13 @@ class UniversalSpider extends ISpiderAdapter {
     jsonList.forEach((item) {
       var cover = item.get("cover").toString();
       var title = item.get("title").toString();
+      var desc = "";
+      {
+        var _desc = item.get("desc");
+        if (_desc != null && _desc.isString) {
+          desc = _desc.toString();
+        }
+      }
       var id = item.get("id").toString();
       var remark = item.get("remark").toString();
       var playlist = item.getList("playlist");
@@ -64,16 +71,20 @@ class UniversalSpider extends ISpiderAdapter {
       if (playlist != null && playlist.isNotEmpty) {
         var videoInfos = playlist.map((item) {
           var name = item.get("text").toString();
-          var iframeId = item.get("id").toString();
-          var realUrl = item.get('url').toString();
+          var _id = item.get("id");
+          var _url = item.get("url");
           late VideoType type;
           late String url;
-          if (realUrl.isNotEmpty && realUrl != "null") {
+          if (_url != null && _url.isString) {
             type = VideoType.m3u8;
-            url = realUrl;
+            url = _url.toString();
           } else {
             type = VideoType.iframe;
-            url = iframeId;
+            if (_id == null) {
+              url = "";
+            } else {
+              url = _id.toString();
+            }
           }
           return VideoInfo(
             name: name,
@@ -92,6 +103,7 @@ class UniversalSpider extends ISpiderAdapter {
         VideoDetail(
           id: id,
           title: title,
+          desc: desc,
           remark: remark,
           extra: {},
           videos: realVideos,

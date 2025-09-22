@@ -58,6 +58,7 @@ declare global {
     title: string
     cover: string
     remark: string
+    desc?: string
     playlist: Array<IPlaylist>
   }
 
