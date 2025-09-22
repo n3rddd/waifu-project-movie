@@ -146,6 +146,8 @@ dependencies:
 
   nuts_activity_indicator: ^1.0.0
 
+  scrolls_to_top: ^2.1.1
+
 dependency_overrides:
   media_kit:
     git:
