@@ -20,6 +20,8 @@ flutter pub get .
 flutter pub run build_runner build
 # brew install cocoapods
 flutter run
+# chmod u+x JS/sync
+./JS/sync
 ```
 
 # PR: 贡献源(代码)

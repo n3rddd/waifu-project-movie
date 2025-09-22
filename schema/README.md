@@ -1,3 +1,7 @@
+# Deprecated
+
+FIXME(d1y): 这部分已经过时, 需要更新
+
 # Schema
 
 `asset.json` 是源合集列表格式
