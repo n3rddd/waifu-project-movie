@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:after_layout/after_layout.dart';
@@ -19,6 +20,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:catmovie/app/modules/home/controllers/home_controller.dart';
 import 'package:catmovie/app/modules/home/views/parse_vip_manage.dart';
@@ -31,7 +33,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:simple/x.dart';
-import 'package:smooth_list_view/smooth_list_view.dart';
 import 'package:tuple/tuple.dart';
 import 'package:xi/xi.dart';
 import 'package:media_kit/media_kit.dart';
@@ -95,18 +96,6 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
   }
 
   List<Videos> playlist = [];
-
-  Map<int, Widget> get tabviewData {
-    Map<int, Widget> result = {};
-    playlist.asMap().forEach((key, value) {
-      result[key] = Text(value.title);
-    });
-    return result;
-  }
-
-  bool get canRenderIosStyle {
-    return playlist.length >= 4;
-  }
 
   final double offsetSize = 12;
   final coverHeightScale = .48;
@@ -470,7 +459,6 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
       children: [
         _buildWithDesc,
         Container(
-          height: 32,
           margin: EdgeInsets.symmetric(
             horizontal: 12,
             vertical: 6,
@@ -478,104 +466,171 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "播放列表",
                 style: TextStyle(
                   fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              if (!playlistIsEmpty && playlist[play.tabIndex].datas.length >= 2)
-                IconButton(
-                  tooltip: playlistSort.name,
-                  onPressed: handleSortPlaylist,
-                  icon: Icon(playlistSort.icon),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!playlistIsEmpty &&
+                      playlist[play.tabIndex].datas.length >= 2)
+                    IconButton(
+                      tooltip: playlistSort.name,
+                      onPressed: handleSortPlaylist,
+                      icon: Transform.rotate(
+                        angle: playlistSort == PlaylistSort.up ? math.pi : 0,
+                        child: SvgPicture.string(
+                          r"""
+                      <svg t="1758649652025" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8688" width="200" height="200"><path d="M301.696 164.544c-27.776 0-51.2 24-54.464 55.808l-0.384 7.424v452.416L175.872 598.528c-20.48-23.488-53.312-24.64-75.008-2.624-21.696 22.016-24.832 59.712-7.104 86.08l4.544 5.888 164.608 189.632c1.536 1.792 3.2 3.456 4.928 5.056l-4.928-5.12a53.312 53.312 0 0 0 29.12 17.536l1.536 0.32a30.592 30.592 0 0 0 3.456 0.448l1.472 0.128 1.344 0.064 1.92 0.064 1.792-0.128h1.408c0.512 0 0.96 0 1.472-0.128L301.696 896a50.88 50.88 0 0 0 38.784-18.56l164.672-189.568 4.48-5.888c17.728-26.368 14.656-64-7.04-86.08-21.76-22.016-54.592-20.864-75.072 2.624l-70.912 81.664v-452.48c0-34.816-24.576-63.168-54.912-63.168z m365.76 601.92l-5.76 0.32a49.792 49.792 0 0 0-42.88 52.736 49.408 49.408 0 0 0 48.64 47.232h243.84l5.696-0.384c25.6-3.136 44.416-26.24 42.88-52.736a49.408 49.408 0 0 0-48.64-47.168h-243.84zM588.544 465.856a49.792 49.792 0 0 0-42.88 52.736 49.408 49.408 0 0 0 48.64 47.232h316.992l5.696-0.384c25.6-3.136 44.416-26.24 42.88-52.736a49.408 49.408 0 0 0-48.64-47.232H594.368l-5.76 0.384zM521.152 164.544l-5.76 0.384a49.792 49.792 0 0 0-42.88 52.736 49.408 49.408 0 0 0 48.64 47.232h390.144l5.696-0.384c25.6-3.136 44.416-26.24 42.88-52.736a49.408 49.408 0 0 0-48.64-47.232H521.216z" fill="#333333" p-id="8689"></path></svg>
+                      """,
+                          width: 21,
+                          height: 21,
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            context.isDarkMode ? Colors.white : Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (playlist.length > 1)
+                    IconButton(
+                      tooltip: "播放源",
+                      onPressed: () {
+                        showCupertinoModalBottomSheet(
+                            context: context,
+                            builder: (_) {
+                              return SizedBox(
+                                width: double.infinity,
+                                height: context.mediaQuery.size.height * .72,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    spacing: 12,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            spacing: 6,
+                                            children: [
+                                              SvgPicture.string(
+                                                r"""
+<svg t="1758651075092" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="19790" width="200" height="200"><path d="M384.31 162.15c8.82 0 16 7.18 16 16v224c0 8.82-7.18 16-16 16h-224c-8.82 0-16-7.18-16-16v-224c0-8.82 7.18-16 16-16h224m0-64h-224c-44.18 0-80 35.82-80 80v224c0 44.18 35.82 80 80 80h224c44.18 0 80-35.82 80-80v-224c0-44.18-35.82-80-80-80zM383.79 607.69c8.82 0 16 7.18 16 16v224c0 8.82-7.18 16-16 16h-224c-8.82 0-16-7.18-16-16v-224c0-8.82 7.18-16 16-16h224m0-64h-224c-44.18 0-80 35.82-80 80v224c0 44.18 35.82 80 80 80h224c44.18 0 80-35.82 80-80v-224c0-44.18-35.82-80-80-80zM860.1 608c8.82 0 16 7.18 16 16v224c0 8.82-7.18 16-16 16h-224c-8.82 0-16-7.18-16-16V624c0-8.82 7.18-16 16-16h224m0-64h-224c-44.18 0-80 35.82-80 80v224c0 44.18 35.82 80 80 80h224c44.18 0 80-35.82 80-80V624c0-44.18-35.82-80-80-80zM912.21 113H585.22c-17.67 0-32 14.33-32 32s14.33 32 32 32h326.99c17.67 0 32-14.33 32-32s-14.32-32-32-32zM912.21 404H585.22c-17.67 0-32 14.33-32 32s14.33 32 32 32h326.99c17.67 0 32-14.33 32-32s-14.32-32-32-32zM910.18 258.5H583.19c-17.67 0-32 14.33-32 32s14.33 32 32 32h326.99c17.67 0 32-14.33 32-32s-14.32-32-32-32z" p-id="19791"></path><path d="M717 822.41c-12.14 0-24.3-4.19-34.02-12.6l-0.85-0.73-41.6-41.39c-12.53-12.46-12.58-32.73-0.12-45.25 12.46-12.53 32.73-12.58 45.25-0.12l31.88 31.72 90.49-79.12c13.3-11.63 33.52-10.28 45.15 3.03 11.63 13.3 10.28 33.52-3.03 45.15l-98.91 86.48c-9.7 8.54-21.96 12.83-34.24 12.83z m-7.89-61c-0.02 0.02-0.04 0.03-0.05 0.05l0.05-0.05z" p-id="19792"></path></svg>
+""",
+                                                width: 24,
+                                                height: 24,
+                                                colorFilter: ColorFilter.mode(
+                                                  context.isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                  BlendMode.srcIn,
+                                                ),
+                                              ),
+                                              Text(
+                                                "选择播放源",
+                                                style: TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ],
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            icon: Icon(Icons.close),
+                                          )
+                                        ],
+                                      ),
+                                      Expanded(
+                                          child: SizedBox(
+                                        width: double.infinity,
+                                        child: SingleChildScrollView(
+                                          child: Wrap(
+                                            alignment: WrapAlignment.start,
+                                            spacing: 9,
+                                            runSpacing: 12,
+                                            children: playlist
+                                                .asMap()
+                                                .entries
+                                                .map((entry) {
+                                              int index = entry.key;
+                                              var item = entry.value;
+                                              var isCurr =
+                                                  index == play.tabIndex;
+                                              return HoverCursor(
+                                                child: CupertinoButton.filled(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 6,
+                                                    horizontal: 12,
+                                                  ),
+                                                  color: isCurr
+                                                      ? (context.isDarkMode
+                                                              ? "#f1f1f1"
+                                                              : "#0f0f0f")
+                                                          .$color
+                                                      : (context.isDarkMode
+                                                              ? '#272727'
+                                                              : "#e2e8f0")
+                                                          .$color,
+                                                  child: Text(item.title,
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: isCurr
+                                                            ? (context
+                                                                    .isDarkMode
+                                                                ? Colors.black
+                                                                : Colors.white)
+                                                            : Theme.of(context)
+                                                                .textTheme
+                                                                .labelLarge!
+                                                                .color,
+                                                      )),
+                                                  onPressed: () {
+                                                    if (index !=
+                                                        play.tabIndex) {
+                                                      play.changeTabIndex(
+                                                          index);
+                                                      boop.selection();
+                                                    }
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      )),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      icon: SvgPicture.string(
+                        r"""
+<svg t="1758648418740" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5908" width="200" height="200"><path d="M487 347.43C487 424.512 424.512 487 347.43 487H237.57C160.488 487 98 424.512 98 347.43V237.57C98 160.488 160.488 98 237.57 98h109.86C424.512 98 487 160.488 487 237.57v109.86zM487 786.43C487 863.512 424.512 926 347.43 926H237.57C160.488 926 98 863.512 98 786.43V676.57C98 599.488 160.488 537 237.57 537h109.86C424.512 537 487 599.488 487 676.57v109.86zM926 347.43C926 424.512 863.512 487 786.43 487H676.57C599.488 487 537 424.512 537 347.43V237.57C537 160.488 599.488 98 676.57 98h109.86C863.512 98 926 160.488 926 237.57v109.86zM730.7 533.6c-107.861 0-195.3 87.439-195.3 195.3s87.439 195.3 195.3 195.3S926 836.761 926 728.9s-87.439-195.3-195.3-195.3z m0 309.734c-63.2 0-114.435-51.234-114.435-114.434S667.5 614.465 730.7 614.465 845.134 665.7 845.134 728.9 793.9 843.334 730.7 843.334z" fill="#666666" p-id="5909"></path></svg>
+""",
+                        width: 21,
+                        height: 21,
+                        colorFilter: ColorFilter.mode(
+                          (context.isDarkMode ? Colors.white : Colors.black),
+                          BlendMode.srcIn,
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                ],
+              ),
             ],
           ),
-        ),
-        Container(
-          width: double.infinity,
-          height: canRenderIosStyle ? 32 + 12 : null,
-          decoration: canRenderIosStyle
-              ? BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey.withValues(alpha: .2),
-                      width: 1,
-                    ),
-                  ),
-                )
-              : null,
-          padding: canRenderIosStyle
-              ? const EdgeInsets.only(
-                  bottom: 12,
-                )
-              : null,
-          child: Builder(builder: (_) {
-            var isNext = playlist.length <= 1 || tabviewData[1] == null;
-            if (isNext) return const SizedBox.shrink();
-            if (canRenderIosStyle) {
-              return SmoothListView.builder(
-                duration: kSmoothListViewDuration,
-                scrollDirection: Axis.horizontal,
-                itemCount: playlist.length,
-                itemBuilder: (context, index) {
-                  var isCurrentIndex = index == play.tabIndex;
-                  var current = playlist[index];
-                  var currentBorderColor = isCurrentIndex
-                      ? CupertinoTheme.of(context).primaryColor
-                      : (context.isDarkMode ? Colors.white : Colors.black)
-                          .withValues(alpha: .42);
-                  return GestureDetector(
-                    onTap: () {
-                      play.changeTabIndex(index);
-                      boop.selection();
-                    },
-                    child: AnimatedContainer(
-                      alignment: Alignment.center,
-                      height: 32,
-                      duration: const Duration(milliseconds: 300),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: currentBorderColor,
-                        ),
-                      ),
-                      margin: const EdgeInsets.only(
-                        right: 6,
-                        left: 9,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                      ),
-                      child: Text(
-                        current.title,
-                        style: TextStyle(
-                          color: currentBorderColor,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  );
-                },
-              );
-            }
-            return Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: 12).copyWith(bottom: 12),
-              child: CupertinoSlidingSegmentedControl(
-                backgroundColor: Colors.black26,
-                thumbColor: context.isDarkMode ? Colors.blue : Colors.white,
-                onValueChanged: (value) {
-                  if (value == null) return;
-                  play.changeTabIndex(value);
-                  boop.selection();
-                },
-                groupValue: play.tabIndex,
-                children: tabviewData,
-              ),
-            );
-          }),
         ),
         Expanded(
           child: Padding(
@@ -805,10 +860,12 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
                             onTap: () {
                               var ps = play.playState;
                               if (ps == kEmptyPlayState) {
+                                EasyLoading.dismiss();
                                 Get.back();
                                 return;
                               }
                               var curr = playlist[ps.tabIndex].datas[ps.index];
+                              EasyLoading.dismiss();
                               Get.back(
                                 result: Tuple2(play.playState, curr.name),
                               );
