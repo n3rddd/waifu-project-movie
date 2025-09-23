@@ -446,13 +446,16 @@ class MacCMSSpider extends ISpiderAdapter {
   VideoDetail __parseListItem(dynamic item) {
     var videos = <VideoInfo>[];
     // 参考格式: vod_play_from":"ukyun$$$ukm3u8","vod_play_server":"no$$$no","vod_play_note":"$$$","vod_play_url": "xxxx$$$xxxxx"
-    String vodFrom = item["vod_play_from"];
-    String vodNote = item['vod_play_note'];
+    String vodFrom = item["vod_play_from"] ?? "默认";
+    String vodNote = item['vod_play_note'] ?? "";
     String _vodURL = (item['vod_play_url'] ?? "");
     late List<String> tags;
     if (vodNote.isNotEmpty) {
       tags = vodFrom.split(vodNote /* $$$ */);
     } else {
+      if (vodFrom.isEmpty) {
+        vodFrom = "默认";
+      }
       tags = [vodFrom];
     }
     String vodURL = _vodURL.replaceAll(RegExp(r'#$'), '');
@@ -481,11 +484,17 @@ class MacCMSSpider extends ISpiderAdapter {
             })
             .toList()
             .join("#");
-        var video = VideoInfo(name: key, url: url);
+        var video = VideoInfo(name: key, url: url, type: easyGetVideoType(url));
         videos.add(video);
       });
     } else if (tags.length == 1) {
-      videos.add(VideoInfo(name: tags[0], url: _vodURL));
+      videos.add(
+        VideoInfo(
+          name: tags[0],
+          url: _vodURL,
+          type: easyGetVideoType(_vodURL),
+        ),
+      );
     }
     var _id = item['vod_id'];
     late String id;
