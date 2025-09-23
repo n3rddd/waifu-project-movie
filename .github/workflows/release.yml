@@ -7,6 +7,7 @@ on:
 
 env:
   FLUTTER_VERSION: 3.35.3
+  GIST_ID: 3fc0adf7ac60b351a9432e9f8ed4e9d3
   LINUX_DEPENDENCIES: git wget unzip python3 zip xz-utils curl clang cmake ninja-build pkg-config libgtk-3-dev libblkid-dev liblzma-dev libjsoncpp-dev cmake-data libjsoncpp25 libsecret-1-dev libsecret-1-0 librhash0 libsqlite3-dev libappindicator3-dev gettext libwebkit2gtk-4.1-dev libasound2-dev libmpv-dev mpv
 
 jobs:
@@ -20,6 +21,14 @@ jobs:
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
+      - name: Download kitty.umd.js from gist
+        run: |
+          echo "📥 Downloading kitty.umd.js from gist..."
+          mkdir -p packages/xi/assets/js
+          curl -L -o packages/xi/assets/js/kitty.umd.js "https://gist.githubusercontent.com/d1y/${{ env.GIST_ID }}/raw/kitty.umd.js"
+          echo "✅ Downloaded kitty.umd.js"
+        shell: bash
+
       - name: Install project dependencies
         run: |
           ./script/fetch_git_info.ps1
@@ -62,6 +71,14 @@ jobs:
           cache: true
       - name: Disable Google Analytics
         run: flutter config --no-analytics
+      - name: Download kitty.umd.js from gist
+        run: |
+          echo "📥 Downloading kitty.umd.js from gist..."
+          mkdir -p packages/xi/assets/js
+          curl -L -o packages/xi/assets/js/kitty.umd.js \
+            "https://gist.githubusercontent.com/d1y/${{ env.GIST_ID }}/raw/kitty.umd.js"
+          echo "✅ Downloaded kitty.umd.js"
+
       - name: Install dependencies
         run: |
           flutter pub get
@@ -113,6 +130,14 @@ jobs:
         run: node script/draft-release-notes.js > release-notes.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download kitty.umd.js from gist
+        run: |
+          echo "📥 Downloading kitty.umd.js from gist..."
+          mkdir -p packages/xi/assets/js
+          curl -L -o packages/xi/assets/js/kitty.umd.js \
+            "https://gist.githubusercontent.com/d1y/${{ env.GIST_ID }}/raw/kitty.umd.js"
+          echo "✅ Downloaded kitty.umd.js"
 
       - name: Build android apk
         run: |
