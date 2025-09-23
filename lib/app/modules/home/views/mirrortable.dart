@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:catmovie/app/extension.dart';
 import 'package:catmovie/app/widget/zoom.dart';
 import 'package:catmovie/utils/boop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+
 import 'package:get/get.dart';
 import 'package:catmovie/app/modules/home/controllers/home_controller.dart';
 import 'package:catmovie/app/modules/home/views/mirror_check.dart';
@@ -16,7 +16,6 @@ import 'package:catmovie/app/widget/wechat_popmenu.dart';
 import 'package:catmovie/shared/manage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:smooth_list_view/smooth_list_view.dart';
 import 'package:xi/xi.dart';
 
 enum MenuActionType {
@@ -103,12 +102,6 @@ class _MirrorTableViewState extends State<MirrorTableView> {
     super.dispose();
   }
 
-  /// 标题
-  String get _title {
-    var count = mirrorList.length;
-    return "视频源管理($count)";
-  }
-
   var menuItems = [
     ItemModel(
       '批量检测源',
@@ -130,6 +123,15 @@ class _MirrorTableViewState extends State<MirrorTableView> {
   final CustomPopupMenuController _controller = CustomPopupMenuController();
 
   Map<String, bool> __statusMap = {};
+
+  int get mirrorGridCount {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double minCardWidth = 160;
+    double spacing = 12;
+    int count = ((screenWidth + spacing) / (minCardWidth + spacing)).floor();
+    count = count.clamp(2, 6);
+    return count;
+  }
 
   Future<void> handleClickSubMenu(MenuActionType action) async {
     switch (action) {
@@ -236,98 +238,105 @@ class _MirrorTableViewState extends State<MirrorTableView> {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        previousPageTitle: _title,
-        backgroundColor: context.isDarkMode ? Colors.black : Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: CupertinoColors.systemGrey.withOpacity(.24),
-            width: 1,
-          ),
-        ),
-        trailing: CustomPopupMenu(
-          menuBuilder: () => PopMenuBox(
-            items: menuItems,
-            onTap: (MenuActionType value) {
-              _controller.hideMenu();
-              handleClickSubMenu(value);
-              boop.selection();
-            },
-          ),
-          pressType: PressType.singleClick,
-          verticalMargin: -10,
-          controller: _controller,
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            child: const Icon(
-              CupertinoIcons.command,
-              size: 24,
-              color: CupertinoColors.activeBlue,
-            ),
-          ),
-        ),
-      ),
-      child: SafeArea(
-        child: Scrollbar(
-          controller: scrollController,
-          child: SmoothListView.builder(
-            duration: kSmoothListViewDuration,
-            controller: scrollController,
-            itemCount: mirrorList.length,
-            itemBuilder: (_, index) {
-              var e = mirrorList[index];
-              return MirrorCard(
-                item: e,
-                current: home.currentMirrorItem == e,
-                onTap: () {
-                  var index = mirrorList.indexOf(e);
-                  home.updateMirrorIndex(index);
-                  Get.back();
-                  boop.selection();
-                },
-                hashTable: __statusMap,
-                // FIXME: 目前看看, 删除源的逻辑暂时不需要了, 可以考虑将这里删除
-                onDel: (context) {
-                  showCupertinoDialog(
-                    builder: (context) => CupertinoAlertDialog(
-                      content: const Text("是否删除该镜像源?"),
-                      actions: [
-                        CupertinoDialogAction(
-                          child: const Text(
-                            '我想想',
-                            style: TextStyle(
-                              color: Colors.blue,
-                            ),
-                          ),
-                          onPressed: () {
-                            Get.back();
-                          },
-                        ),
-                        CupertinoDialogAction(
-                          child: const Text(
-                            '删除',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              mirrorList.remove(e);
-                            });
-                            home.removeMirrorItemSync(e);
-                            SpiderManage.removeItem(e);
-                            Get.back();
-                          },
-                        ),
-                      ],
+    return SizedBox(
+      width: double.infinity,
+      height: context.mediaQuery.size.height * .72,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          spacing: 12,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  spacing: 6,
+                  children: [
+                    Icon(
+                      CupertinoIcons.cube_box,
+                      size: 28,
+                      color: context.isDarkMode ? Colors.white : Colors.black,
                     ),
-                    context: context,
-                  );
-                },
-              );
-            },
-          ),
+                    Text(
+                      "源管理",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  spacing: 6,
+                  children: [
+                    CustomPopupMenu(
+                      menuBuilder: () => PopMenuBox(
+                        items: menuItems,
+                        onTap: (MenuActionType value) {
+                          _controller.hideMenu();
+                          handleClickSubMenu(value);
+                          boop.selection();
+                        },
+                      ),
+                      pressType: PressType.singleClick,
+                      verticalMargin: -10,
+                      controller: _controller,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: Icon(
+                          CupertinoIcons.command,
+                          size: 20,
+                          color:
+                              context.isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: context.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Expanded(
+              child: SizedBox(
+                width: double.infinity,
+                child: Scrollbar(
+                  controller: scrollController,
+                  child: GridView.builder(
+                    controller: scrollController,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: mirrorGridCount,
+                      mainAxisExtent: 80,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                    ),
+                    itemCount: mirrorList.length,
+                    itemBuilder: (_, index) {
+                      var e = mirrorList[index];
+                      return MirrorCard(
+                        item: e,
+                        current: home.currentMirrorItem == e,
+                        onTap: () {
+                          var index = mirrorList.indexOf(e);
+                          home.updateMirrorIndex(index);
+                          Get.back();
+                          boop.selection();
+                        },
+                        hashTable: __statusMap,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -341,21 +350,15 @@ class MirrorCard extends StatelessWidget {
     this.current = false,
     required this.onTap,
     required this.hashTable,
-    this.onDel,
-    this.minHeight = 42.0,
-    this.maxHeight = 81.0,
   });
 
-  final double minHeight;
 
-  final double maxHeight;
 
   final ISpiderAdapter item;
 
   final bool current;
 
-  @Deprecated('删除源的逻辑暂时不需要了, 可以考虑将这里删除')
-  final SlidableActionCallback? onDel;
+
 
   final VoidCallback onTap;
 
@@ -365,121 +368,79 @@ class MirrorCard extends StatelessWidget {
 
   String get _desc => item.meta.desc;
 
-  /// [current] 当前的不能删除
-  /// [SpiderManage.builtin] 内建的源不可删除
-  bool get enabled {
-    bool isBuiltin = SpiderManage.builtin.any((element) => element == item);
-    return !current && !isBuiltin;
-  }
 
-  /// 如果是 [ISpiderAdapter.isNsfw] => [Colors.red]
-  /// 如果是 [current] => [Colors.blue] (优先级高一点)
-  Color _color(bool isDark) {
-    if (current) return Colors.blue;
-    return item.isNsfw ? Colors.red : (isDark ? Colors.white : Colors.black45);
-  }
 
   @override
   Widget build(BuildContext context) {
-    Color borderColor = context.isDarkMode
-        ? Colors.white.withValues(alpha: .1)
-        : Colors.black.withValues(alpha: .1);
-    Color textColor = _color(context.isDarkMode);
+    Color backgroundColor = current
+        ? (context.isDarkMode ? "#f1f1f1" : "#0f0f0f").$color
+        : (context.isDarkMode ? '#272727' : "#e2e8f0").$color;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minHeight: minHeight,
-        maxHeight: maxHeight,
-      ),
-      child: Zoom(
-        scaleRatio: .99,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: borderColor,
-              ),
-            ),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-          child: Row(
-            spacing: 12,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // ignore: dead_code
-              if (false) Builder(builder: (context) {
-                // NOTE(d1y): 这里的 logo 展示不太好看, 所以先不要了, 等待展示更好的图标
-                var logo = item.meta.logo;
-                if (logo.isEmpty || true) {
-                  var uri = Uri.parse(item.meta.api);
-                  logo = "${uri.origin}/favicon.ico";
-                }
-                return CachedNetworkImage(
-                  fit: BoxFit.cover,
-                  imageUrl: logo,
-                  errorWidget: (context, url, error) => const Icon(
-                    CupertinoIcons.cube_box,
-                    size: 42,
-                  ),
-                  placeholder: (context, url) => Center(child: const CupertinoActivityIndicator()),
-                  width: 42,
-                );
-              }),
-              Expanded(
-                child: Column(
-                  spacing: 3,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _title,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 18,
-                        decoration: TextDecoration.none,
-                        fontWeight: current ? FontWeight.bold : FontWeight.w300,
-                      ),
+    Color textColor = current
+        ? (context.isDarkMode ? Colors.black : Colors.white)
+        : (context.isDarkMode ? Colors.white : Colors.black);
+
+    return Zoom(
+      scaleRatio: .99,
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    _title,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 14,
+                      decoration: TextDecoration.none,
+                      fontWeight: FontWeight.bold,
                     ),
-                    _desc.isEmpty
-                        ? const SizedBox.shrink()
-                        : Text(
-                            _desc,
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 9,
-                              decoration: TextDecoration.none,
-                              fontWeight: FontWeight.w300,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                    Builder(builder: (context) {
-                      var status = item.meta.status
-                          ? MovieStatusType.available
-                          : MovieStatusType.unavailable;
-                      var cacheStatus = hashTable[item.meta.id] ?? true;
-                      return MovieStatusWidget(
-                        status: status,
-                        cacheStatus: cacheStatus,
-                      );
-                    }),
-                  ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+                Icon(
+                  current ? Icons.done : CupertinoIcons.right_chevron,
+                  color: textColor,
+                  size: 16,
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            if (_desc.isNotEmpty)
+              Text(
+                _desc,
+                style: TextStyle(
+                  color: textColor.withValues(alpha: 0.7),
+                  fontSize: 10,
+                  decoration: TextDecoration.none,
+                  fontWeight: current ? FontWeight.bold : FontWeight.w300,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              Row(
-                children: [
-                  Icon(
-                    current ? Icons.done : CupertinoIcons.right_chevron,
-                    color: textColor,
-                  ),
-                  const SizedBox(
-                    width: 8,
-                  ),
-                ],
-              ),
-            ],
-          ),
+            const SizedBox(height: 4),
+            Builder(builder: (context) {
+              var status = item.meta.status
+                  ? MovieStatusType.available
+                  : MovieStatusType.unavailable;
+              var cacheStatus = hashTable[item.meta.id] ?? true;
+              return MovieStatusWidget(
+                status: status,
+                cacheStatus: cacheStatus,
+              );
+            }),
+          ],
         ),
       ),
     );
@@ -492,9 +453,6 @@ enum MovieStatusType {
 
   /// 不可用
   unavailable,
-
-  /// 未知
-  unknown,
 }
 
 extension MovieStatusTypeExtension on MovieStatusType {
@@ -504,10 +462,6 @@ extension MovieStatusTypeExtension on MovieStatusType {
         return '可用';
       case MovieStatusType.unavailable:
         return '上次不可用';
-      case MovieStatusType.unknown:
-        return '未知';
-      default:
-        return '未知';
     }
   }
 }
@@ -528,7 +482,7 @@ class MovieStatusWidget extends StatelessWidget {
   Color get _color {
     switch (_type) {
       case MovieStatusType.available:
-        return Colors.pink;
+        return Colors.green;
       case MovieStatusType.unavailable:
         return Colors.grey;
       default:
