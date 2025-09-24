@@ -71,6 +71,12 @@ class JS2 {
 
         options.headers = defaultHeaders;
 
+        if ((argMap["bodyType"] ?? "") == "form") {
+          if (argMap["data"] is Map) {
+            argMap["data"] = FormData.fromMap(argMap["data"]);
+          }
+        }
+
         var result = "";
         try {
           var resp = await XHttp.dio.request(

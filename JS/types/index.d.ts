@@ -55,6 +55,7 @@ declare global {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS'
     headers?: Record<string, string>
     params?: Record<string, any>
+    bodyType?: 'json' | 'form'
     data?: any
   }
 
