@@ -23,6 +23,14 @@ declare global {
 
   interface KittyUtils {
     /**
+     * ```js
+     *  const url = `${env.baseUrl}${env.get("iframe")}`
+     * ```
+     * ↑↑↑↑ 拼接完成之后, 在调用 [getM3u8WithStr]
+     * @param env {KittyEnv}
+     */
+    getM3u8WithIframe(env: KittyEnv): Promise<string>
+    /**
      * 获取 `iframe` 的 `m3u8` 直链
      * 适用于:
      * ```html
@@ -34,7 +42,7 @@ declare global {
      * </script>
      * ```
      */
-    getM3u8WithIframe(env: KittyEnv): Promise<string>
+    getM3u8WithStr(str: string): string
   }
 
   interface Kitty {
