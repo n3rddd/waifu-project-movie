@@ -651,7 +651,7 @@ class _PlayViewState extends State<PlayView> with AfterLayoutMixin {
                   var curr = playlist[play.tabIndex].datas[index];
                   String playUrl = curr.url;
                   var isCast =
-                      playUrl.endsWith(".m3u8") || playUrl.endsWith(".mp4");
+                      curr.type == VideoType.m3u8 || curr.type == VideoType.mp4;
                   return Builder(builder: (menuContext) {
                     return PullDownButton(
                       itemBuilder: (context) {
