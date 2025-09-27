@@ -12,6 +12,45 @@ import 'package:xi/xi.dart';
 const kUpdateUpstream =
     "https://api.github.com/repos/waifu-project/movie/releases";
 
+/// 豆包
+/// 将HTML中的img标签转换为Markdown图片格式
+/// [input] 包含img标签的原始字符串
+/// [defaultAlt] 当img标签没有alt属性时使用的默认文本
+String convertImgTagsToMarkdown(String input, {String defaultAlt = '图片'}) {
+  // 使用原始字符串处理各种引号情况，避免转义问题
+  // 处理alt在src后面的情况
+  final regexSrcFirst = RegExp(r'''<img[^>]*src=("|')([^"']*)\1[^>]*alt=("|')([^"']*)\3[^>]*>''',
+      caseSensitive: false);
+  
+  // 处理alt在src前面的情况
+  final regexAltFirst = RegExp(r'''<img[^>]*alt=("|')([^"']*)\1[^>]*src=("|')([^"']*)\3[^>]*>''',
+      caseSensitive: false);
+
+  // 处理没有alt属性的情况
+  final regexNoAlt = RegExp(r'''<img[^>]*src=("|')([^"']*)\1[^>]*>''',
+      caseSensitive: false);
+
+  // 分步替换，确保所有情况都能被处理
+  String result = input
+      .replaceAllMapped(regexSrcFirst, (match) {
+        String imageUrl = match.group(2) ?? '';
+        String altText = match.group(4) ?? defaultAlt;
+        return '![$altText]($imageUrl)';
+      })
+      .replaceAllMapped(regexAltFirst, (match) {
+        String altText = match.group(2) ?? defaultAlt;
+        String imageUrl = match.group(4) ?? '';
+        return '![$altText]($imageUrl)';
+      })
+      .replaceAllMapped(regexNoAlt, (match) {
+        String imageUrl = match.group(2) ?? '';
+        return '![$defaultAlt]($imageUrl)';
+      });
+  
+  return result;
+}
+
+
 class AutoUpdate extends StatefulWidget {
   const AutoUpdate({super.key});
 
@@ -32,6 +71,7 @@ class _AutoUpdateState extends State<AutoUpdate> with AfterLayoutMixin {
       return GithubTag.fromJson(item as Map<String, dynamic>);
     }).toList();
     tag = tags[0];
+    tag!.body = convertImgTagsToMarkdown(tag!.body);
     setState(() {});
   }
 
@@ -47,14 +87,6 @@ class _AutoUpdateState extends State<AutoUpdate> with AfterLayoutMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12).copyWith(top: 12),
-            child: Text(
-              "# ${tag!.tag_name}",
-              style: TextStyle(fontSize: 24),
-            ),
-          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(12),
