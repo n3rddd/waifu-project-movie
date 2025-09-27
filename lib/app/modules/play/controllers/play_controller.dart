@@ -395,14 +395,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
   Future<String> parseIframe(String iframe) async {
     var closed = showLoading("正在解析iframe");
-    var result = await home.currentMirrorItem.parseIframe(iframe);
-    closed();
+    List<String> result = [];
+    var error = "";
+    try {
+      result = await home.currentMirrorItem.parseIframe(iframe);
+    } catch (e) {
+      error = e.toString();
+      debugPrint("parseIframe error: $e");
+    } finally {
+      closed();
+    }
+    if (error.isNotEmpty) {
+      EasyLoading.showError(error);
+      return "";
+    }
     if (result.isEmpty) {
       EasyLoading.showError("解析失败, 无法播放");
       return "";
     }
-    debugPrint("result: $result");
-    String url = result[0]; // NOTE(d1y): 估计解析到不止一个, 该用哪一个呢!
+    debugPrint("parseIframe result: $result");
+    // NOTE(d1y): 估计解析到不止一个, 该用哪一个呢!
+    // 让用户选择播放哪一个?
+    String url = result[0];
     return url;
   }
 
