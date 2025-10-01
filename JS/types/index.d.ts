@@ -110,11 +110,15 @@ declare global {
     parseIframe: string
   }
 
+  type ITemplateWithJS =
+    "t4" // 道长的 type=4 模板
+
   interface IconfigExtra {
     jiexiUrl?: string
     gfw?: boolean
     searchLimit?: number
     js?: IconfigExtraJS
+    template?: ITemplateWithJS
     [prop: string]: any
   }
 
